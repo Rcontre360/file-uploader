@@ -9,8 +9,12 @@ import {
   Input,
   Text,
 } from 'react-native-elements';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import CloudIcon from 'react-native-vector-icons/FontAwesome5';
+import * as yup from 'yup';
+import {yupResolver} from '@hookform/resolvers/yup';
+import {onSetUser} from '../../redux/actions';
+import {useDispatch} from '../../redux/store';
 import Api from '../../api';
 
 const useStyles = makeStyles(theme => ({
@@ -36,6 +40,7 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center',
     flexDirection: 'column',
     alignItems: 'center',
+    bottom: 50,
     width: '70%',
   },
   loginText: {
@@ -55,11 +60,22 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface Props {
-  navigation: StackNavigationProp<RootStackParamList, 'login'>;
+  navigation: NativeStackNavigationProp<RootStackParamList, 'login'>;
 }
 
 type FormFields = {username: string; password: string};
+
 const defaultValues = {username: '', password: ''};
+const schema = yup.object().shape({
+  username: yup
+    .string()
+    .required('Username is required')
+    .min(3, 'Minimum 3 characters'),
+  password: yup
+    .string()
+    .required('Password is required')
+    .min(3, 'Minimum 3 characters'),
+});
 
 const ModalExample: React.FunctionComponent<Props> = ({navigation}) => {
   const {
@@ -67,14 +83,18 @@ const ModalExample: React.FunctionComponent<Props> = ({navigation}) => {
     handleSubmit,
     reset,
     formState: {errors, isSubmitted},
-  } = useForm<FormFields>({defaultValues});
+  } = useForm<FormFields>({defaultValues, resolver: yupResolver(schema)});
   const {theme} = useTheme();
+  const dispatch = useDispatch();
   const styles = useStyles();
+  const hasErrors = Boolean(errors.username || errors.password);
 
   const onSubmit = () => {
-    Api.send({url: 'success'})
-      .then(res => {
+    Api.send({url: '/users'})
+      .then(({data}: {data: User}) => {
         reset(defaultValues);
+        dispatch(onSetUser(data));
+        navigation.navigate('media');
       })
       .catch(() => {});
   };
@@ -95,13 +115,6 @@ const ModalExample: React.FunctionComponent<Props> = ({navigation}) => {
           <Controller
             name="username"
             control={control}
-            rules={{
-              required: 'Name or email is required',
-              minLength: {
-                value: 3,
-                message: 'Name or email must be at least 3 characters long',
-              },
-            }}
             render={({field: {onChange, onBlur, value}}) => (
               <Input
                 placeholder="Username or Email"
@@ -116,13 +129,6 @@ const ModalExample: React.FunctionComponent<Props> = ({navigation}) => {
           <Controller
             name="password"
             control={control}
-            rules={{
-              required: 'Name or email is required',
-              minLength: {
-                value: 3,
-                message: 'Name or email must be at least 3 characters long',
-              },
-            }}
             render={({field: {onChange, onBlur, value}}) => (
               <Input
                 placeholder="Password"
@@ -130,13 +136,14 @@ const ModalExample: React.FunctionComponent<Props> = ({navigation}) => {
                 onBlur={onBlur}
                 value={value}
                 onChangeText={onChange}
+                errorMessage={errors.password && errors.password.message}
               />
             )}
           />
           <Button
             title="Send"
             onPress={handleSubmit(onSubmit)}
-            loading={isSubmitted}
+            loading={isSubmitted && !hasErrors}
           />
         </Card>
         <View
@@ -147,7 +154,7 @@ const ModalExample: React.FunctionComponent<Props> = ({navigation}) => {
             <Text
               style={styles.loginText}
               onPress={() => navigation.navigate('register')}>
-              Already has account? Login!
+              New account? Register!
             </Text>
           </TouchableOpacity>
         </View>

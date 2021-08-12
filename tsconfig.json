@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": "./src",
+    "baseUrl": "./src",
     "target": "esnext",
     "module": "commonjs",
     "lib": ["es2017"],
@@ -24,7 +25,15 @@
 
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "skipLibCheck": false
+    "skipLibCheck": false,
+    "paths": {
+      "@api/*": ["api/*"],
+      "@assets/*": ["assets/*"],
+      "@components/*": ["components/*"],
+      "@config/*": ["config/*"],
+      "@redux/*": ["redux/*"],
+      "@screens/*": ["screens/*"]
+    }
   },
   "exclude": [
     "node_modules",
