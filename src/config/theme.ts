@@ -5,6 +5,7 @@ const appTheme = (theme: Theme): Theme => ({
     primary: '#EF233C',
     secondary: '#8D99AE',
     grey0: '#EDF2F4',
+    grey1: '#cbd1d4',
     black: '#2B2D42',
   },
   Button: {

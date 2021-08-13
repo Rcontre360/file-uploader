@@ -22,6 +22,11 @@ const ModalExample: React.FunctionComponent<{}> = () => {
           <Header />
           <Stack.Navigator>
             <Stack.Screen
+              name="register"
+              component={Register}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
               name="media"
               component={MediaList}
               options={{headerShown: false}}
@@ -29,11 +34,6 @@ const ModalExample: React.FunctionComponent<{}> = () => {
             <Stack.Screen
               name="login"
               component={Login}
-              options={{headerShown: false}}
-            />
-            <Stack.Screen
-              name="register"
-              component={Register}
               options={{headerShown: false}}
             />
           </Stack.Navigator>

@@ -1,5 +1,5 @@
 import {createReducer} from '@reduxjs/toolkit';
-import {onSetUser} from '../actions';
+import {onSetUser, onSetFiles} from '../actions';
 
 const defaultState = {
   logged: false,
@@ -9,12 +9,15 @@ const defaultState = {
     token: '',
     id: '',
   },
-  files: undefined,
+  files: undefined as undefined | Blob[],
 };
 
 const mainReducer = createReducer(defaultState, builder => {
   builder.addCase(onSetUser, (state, action) => {
     state.user = action.payload;
+  });
+  builder.addCase(onSetFiles, (state, action) => {
+    state.files = action.payload;
   });
 });
 

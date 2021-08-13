@@ -53,6 +53,7 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
   },
   titleText: {
+    color: 'grey',
     top: 5,
     marginLeft: 20,
   },

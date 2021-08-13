@@ -17,6 +17,8 @@ class Api {
           resolve({
             data: {name: 'user', token: 'token', email: '@email.cmo', id: ''},
           });
+        if (url === '/userData')
+          resolve({data: [{name: 'testname a', size: '12kb', type: 'pdf'}]});
       }, 500);
     });
 }
