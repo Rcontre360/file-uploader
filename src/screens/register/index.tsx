@@ -67,14 +67,18 @@ type FormFields = {username: string; password: string; email: string};
 
 const defaultValues = {username: '', password: '', email: ''};
 const schema = yup.object().shape({
-  username: yup
+  userName: yup
     .string()
     .required('Username is required')
     .min(3, 'Minimum 3 characters'),
   password: yup
     .string()
     .required('Password is required')
-    .min(3, 'Minimum 3 characters'),
+    .min(5, 'Minimum 3 characters'),
+  repeatPassword: yup
+    .string()
+    .required('Confirmation is required')
+    .oneOf([yup.ref('password'), null], 'Passwords must match'),
   email: yup
     .string()
     .required('Email is required')
