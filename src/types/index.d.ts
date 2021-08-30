@@ -3,10 +3,9 @@ type RootStackParamList = {
   register: undefined;
   media: undefined;
 };
-
 type User = {
-  name: string;
+  id?: string;
+  userName: string;
   email: string;
-  id: string;
-  token: string;
+  userPassword: string;
 };

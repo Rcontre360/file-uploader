@@ -63,22 +63,27 @@ interface Props {
   navigation: NativeStackNavigationProp<RootStackParamList, 'login'>;
 }
 
-type FormFields = {username: string; password: string; email: string};
+type FormFields = {
+  userName: string;
+  userPassword: string;
+  email: string;
+  repeatPassword: string;
+};
 
-const defaultValues = {username: '', password: '', email: ''};
+const defaultValues = {userName: '', userPassword: '', email: ''};
 const schema = yup.object().shape({
   userName: yup
     .string()
     .required('Username is required')
     .min(3, 'Minimum 3 characters'),
-  password: yup
+  userPassword: yup
     .string()
     .required('Password is required')
     .min(5, 'Minimum 3 characters'),
   repeatPassword: yup
     .string()
     .required('Confirmation is required')
-    .oneOf([yup.ref('password'), null], 'Passwords must match'),
+    .oneOf([yup.ref('userPassword'), null], 'Passwords must match'),
   email: yup
     .string()
     .required('Email is required')
@@ -95,18 +100,20 @@ const Register: React.FunctionComponent<Props> = ({navigation}) => {
   const {theme} = useTheme();
   const styles = useStyles();
   const dispatch = useDispatch();
-  const hasErrors = Boolean(errors.username || errors.password);
+  const hasErrors = Boolean(errors.userName || errors.userPassword);
 
-  const onSubmit = () => {
-    console.log('sent data');
-    Api.send({url: '/users'})
-      .then(({data}: {data: User}) => {
+  const onSubmit = (data: FormFields) => {
+    Api.send({url: '/signup', method: 'post', data})
+      .then(({data, token}: {data: User; token: string}) => {
         reset(defaultValues);
+        Api.setHeaders({headers: {Authorization: `Bearer ${token}`}});
+        console.log('USER', data);
         dispatch(onSetUser(data));
-        console.log('sent data');
         navigation.navigate('media');
       })
-      .catch(() => {});
+      .catch(err => {
+        console.log('error', err.message);
+      });
   };
 
   return (
@@ -137,13 +144,13 @@ const Register: React.FunctionComponent<Props> = ({navigation}) => {
           />
 
           <Controller
-            name="username"
+            name="userName"
             control={control}
             render={({field: {onChange, onBlur, value}}) => (
               <Input
                 placeholder="Username"
                 leftIcon={{type: 'font-awesome', name: 'user-circle'}}
-                errorMessage={errors.username && errors.username.message}
+                errorMessage={errors.userName && errors.userName.message}
                 onBlur={onBlur}
                 value={value}
                 onChangeText={onChange}
@@ -151,7 +158,7 @@ const Register: React.FunctionComponent<Props> = ({navigation}) => {
             )}
           />
           <Controller
-            name="password"
+            name="userPassword"
             control={control}
             render={({field: {onChange, onBlur, value}}) => (
               <Input
@@ -160,14 +167,32 @@ const Register: React.FunctionComponent<Props> = ({navigation}) => {
                 onBlur={onBlur}
                 value={value}
                 onChangeText={onChange}
-                errorMessage={errors.password && errors.password.message}
+                errorMessage={
+                  errors.userPassword && errors.userPassword.message
+                }
+              />
+            )}
+          />
+          <Controller
+            name="repeatPassword"
+            control={control}
+            render={({field: {onChange, onBlur, value}}) => (
+              <Input
+                placeholder="Repeat Password"
+                leftIcon={{type: 'feather', name: 'lock'}}
+                onBlur={onBlur}
+                value={value}
+                onChangeText={onChange}
+                errorMessage={
+                  errors.repeatPassword && errors.repeatPassword.message
+                }
               />
             )}
           />
           <Button
             title="Send"
             onPress={handleSubmit(onSubmit)}
-            loading={isSubmitted && !hasErrors}
+            //loading={isSubmitted && !hasErrors}
           />
         </Card>
         <View

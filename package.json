@@ -16,6 +16,7 @@
     "@react-navigation/native": "^6.0.0",
     "@react-navigation/native-stack": "^6.0.1",
     "@reduxjs/toolkit": "^1.6.1",
+    "axios": "^0.21.1",
     "immer": "^9.0.5",
     "lodash": "^4.17.21",
     "react": "17.0.1",

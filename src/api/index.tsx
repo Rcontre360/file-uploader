@@ -1,26 +1,17 @@
-//import axios from 'axios'
-
-type URL = '/users' | '/error' | '/userData';
-type Request = {
-  url: URL;
-  method?: 'get' | 'post';
-  data?: unknown;
-  query?: string;
-};
+import axios, {AxiosRequestConfig} from 'axios';
 
 class Api {
-  static send = ({url, method}: Request) =>
-    new Promise<any>((resolve, reject) => {
-      setTimeout(() => {
-        if (url === '/error') reject(new Error('fail'));
-        if (url === '/users')
-          resolve({
-            data: {name: 'user', token: 'token', email: '@email.cmo', id: ''},
-          });
-        if (url === '/userData')
-          resolve({data: [{name: 'testname a', size: '12kb', type: 'pdf'}]});
-      }, 500);
-    });
+  static headers: AxiosRequestConfig['headers'] = {};
+
+  static send = (req: AxiosRequestConfig) => {
+    console.log(req, process.env.API_URL);
+    return axios({...req, baseURL: 'http://10.0.2.2:3555'});
+  };
+  static setHeaders = (
+    headerFields: Partial<AxiosRequestConfig['headers']>,
+  ) => {
+    Api.headers = {...Api.headers, ...headerFields};
+  };
 }
 
 export default Api;
