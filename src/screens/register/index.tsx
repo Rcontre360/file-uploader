@@ -10,6 +10,7 @@ import {
   Text,
 } from 'react-native-elements';
 import CloudIcon from 'react-native-vector-icons/FontAwesome5';
+import PushNotification from 'react-native-push-notification';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import * as yup from 'yup';
 import {yupResolver} from '@hookform/resolvers/yup';
@@ -104,12 +105,17 @@ const Register: React.FunctionComponent<Props> = ({navigation}) => {
 
   const onSubmit = (data: FormFields) => {
     Api.send({url: '/signup', method: 'post', data})
-      .then(({data, token}: {data: User; token: string}) => {
+      .then(({data}: {data: {user: User; token: string}}) => {
+        const {user, token} = data;
         reset(defaultValues);
-        Api.setHeaders({headers: {Authorization: `Bearer ${token}`}});
-        console.log('USER', data);
-        dispatch(onSetUser(data));
-        navigation.navigate('media');
+        Api.setHeaders({Authorization: `Bearer ${token}`});
+        PushNotification.localNotification({
+          title: 'We sent a you an email',
+          message: 'Check your mail account',
+          channelId: 'channel',
+        });
+        dispatch(onSetUser(user));
+        if (user.isVerified) navigation.navigate('media' as any);
       })
       .catch(err => {
         console.log('error', err.message);

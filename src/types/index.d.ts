@@ -4,8 +4,8 @@ type RootStackParamList = {
   media: undefined;
 };
 type User = {
-  id?: string;
+  id: string;
   userName: string;
   email: string;
-  userPassword: string;
+  isVerified: boolean;
 };

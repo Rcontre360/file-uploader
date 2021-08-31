@@ -4,10 +4,10 @@ import {onSetUser, onSetFiles} from '../actions';
 const defaultState = {
   logged: false,
   user: {
-    name: '',
+    userName: '',
     email: '',
-    token: '',
     id: '',
+    isVerified: false,
   },
   files: undefined as undefined | Blob[],
 };

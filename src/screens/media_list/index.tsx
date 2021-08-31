@@ -148,11 +148,15 @@ const MediaList: React.FunctionComponent<Props> = ({navigation}) => {
   );
 
   React.useEffect(() => {
-    //if (files === undefined)
-    //Api.send({url: '/userData', query: user.id}).then(({data}) => {
-    //console.log(data);
-    //dispatch(onSetFiles(data));
-    //});
+    if (!files)
+      Api.send({url: `/files/all/${user.id}`})
+        .then(({data}: {data: {files: Blob[]}}) => {
+          const {files} = data;
+          dispatch(onSetFiles(files));
+        })
+        .catch(err => {
+          console.log('there was an error', err);
+        });
   }, [files]);
 
   return (

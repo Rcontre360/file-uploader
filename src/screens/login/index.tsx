@@ -63,14 +63,14 @@ interface Props {
   navigation: NativeStackNavigationProp<RootStackParamList, 'login'>;
 }
 
-type FormFields = {username: string; password: string};
+type FormFields = {email: string; password: string};
 
-const defaultValues = {username: '', password: ''};
+const defaultValues = {email: '', password: ''};
 const schema = yup.object().shape({
-  username: yup
+  email: yup
     .string()
     .required('Username is required')
-    .min(3, 'Minimum 3 characters'),
+    .email('Email is required'),
   password: yup
     .string()
     .required('Password is required')
@@ -87,16 +87,20 @@ const ModalExample: React.FunctionComponent<Props> = ({navigation}) => {
   const {theme} = useTheme();
   const dispatch = useDispatch();
   const styles = useStyles();
-  const hasErrors = Boolean(errors.username || errors.password);
+  const hasErrors = Boolean(errors.email || errors.password);
 
-  const onSubmit = () => {
-    Api.send({url: '/users'})
-      .then(({data}: {data: User}) => {
+  const onSubmit = (data: FormFields) => {
+    Api.send({url: '/login', method: 'post', data})
+      .then(({data}: {data: {user: User; token: string}}) => {
+        const {user, token} = data;
         reset(defaultValues);
-        dispatch(onSetUser(data));
-        navigation.navigate('media');
+        dispatch(onSetUser(user));
+        Api.setHeaders({Authorization: `Bearer ${token}`});
+        if (user.isVerified) navigation.navigate('media');
       })
-      .catch(() => {});
+      .catch(err => {
+        console.log('there was an error', err);
+      });
   };
 
   return (
@@ -113,13 +117,13 @@ const ModalExample: React.FunctionComponent<Props> = ({navigation}) => {
           </View>
 
           <Controller
-            name="username"
+            name="email"
             control={control}
             render={({field: {onChange, onBlur, value}}) => (
               <Input
                 placeholder="Username or Email"
                 leftIcon={{type: 'font-awesome', name: 'user-circle'}}
-                errorMessage={errors.username && errors.username.message}
+                errorMessage={errors.email && errors.email.message}
                 onBlur={onBlur}
                 value={value}
                 onChangeText={onChange}
